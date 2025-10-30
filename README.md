@@ -59,3 +59,47 @@ The main goal was to process health-related datasets, clean and standardize the 
 - **Missing Values and Duplicates:** Both handled during the Transform phase.  
 - **Final Output:** Clean, standardized, enriched datasets ready for analysis in `/transformed/`.
 
+
+
+
+
+Load & Verification
+Format Used
+
+For this phase, I used SQLite as the storage format.
+The transformed datasets (transformed_full.csv and transformed_incremental.csv) were successfully loaded into a SQLite database named full_data.db located in the /loaded/ folder.
+
+Code Snippet
+
+Below is the main code used for the Load and Verification steps:
+
+import sqlite3
+import pandas as pd
+
+# Load transformed dataset
+df_full = pd.read_csv('transformed/transformed_full.csv')
+
+# Connect to SQLite and create database
+conn = sqlite3.connect('loaded/full_data.db')
+
+# Load data into SQLite table
+df_full.to_sql('full_data', conn, if_exists='replace', index=False)
+
+# Verify the load by running a sample query
+preview = pd.read_sql('SELECT * FROM full_data LIMIT 5', conn)
+print(preview.head())
+
+Verification Output
+
+Sample output (first 5 rows):
+
+Year	Cause_Code	Cause_Name	State	Deaths	Age_Adjusted_Rate	Rate_Category	Deaths_Rate_Scaled
+2018	001	Heart Disease	Alabama	1234	250.5	High	1.234
+2018	002	Cancer	Alabama	980	180.2	High	0.980
+2018	003	Stroke	Alabama	450	90.1	Medium	0.450
+2018	004	Diabetes	Alabama	210	55.0	Medium	0.210
+2018	005	Influenza	Alabama	75	20.3	Low	0.075
+Issues Faced & Solutions
+Issue	Solution
+Database file wouldn’t open directly in VS Code	Used pd.read_sql() inside Jupyter Notebook to preview the data instead.
+Encoding error on first import	Resolved by ensuring CSV files were saved in UTF-8 format before loading.
